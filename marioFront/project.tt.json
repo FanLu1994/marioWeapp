@@ -1,0 +1,9 @@
+{
+  "miniprogramRoot": "./",
+  "projectname": "marioFront",
+  "appid": "touristappid",
+  "setting": {
+    "es6": false,
+    "minified": false
+  }
+}

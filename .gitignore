@@ -1,0 +1,12 @@
+
+marioFront/.idea/
+
+marioFront/dist/
+marioFront/deploy_versions/
+marioFront/.temp/
+marioFront/.rn_temp/
+marioFront/node_modules/
+marioFront/.DS_Store
+marioServer/.idea/
+
+marioServer/log/
