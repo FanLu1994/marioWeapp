@@ -1,12 +1,13 @@
 export default {
   pages: [
     'pages/index/index', // 第一项代表首页
-    'pages/my/index'
+    'pages/my/My',
+    'pages/add/Add'
   ],
   tabBar: {
     color: 'black',
     selectedColor:'black',
-    backgroundColor:'#F6C900',
+    backgroundColor:'white',
     borderStyle:'white',
     list:[
       {
@@ -16,7 +17,7 @@ export default {
         selectedIconPath:'asset/images/rank_select.png'
       },
       {
-        pagePath: 'pages/my/index',
+        pagePath: 'pages/my/My',
         text:'我的',
         iconPath:'asset/images/my.png',
         selectedIconPath:'asset/images/my_select.png'
