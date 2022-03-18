@@ -2,7 +2,6 @@ export default {
   pages: [
     'pages/index/index', // 第一项代表首页
     'pages/my/My',
-    'pages/add/Add'
   ],
   tabBar: {
     color: 'black',

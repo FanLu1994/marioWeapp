@@ -1,8 +1,8 @@
 import { Component } from 'react'
 import { Text,View} from '@tarojs/components'
-import {navigateTo} from '@tarojs/taro'
 import './index.less'
-import {AtFab, AtList, AtListItem, AtTabBar} from "taro-ui";
+import {AtFab, AtFloatLayout, AtList, AtListItem, AtTabBar} from "taro-ui";
+import Add from "../add/add";
 
 
 export default class Index extends Component<any,any> {
@@ -11,6 +11,7 @@ export default class Index extends Component<any,any> {
     this.state = {
       current:0,
       mapList:[1,2,3,4,5,6,7,8,9,10],
+      isOpenFloatLayout:false,
     }
   }
 
@@ -21,13 +22,23 @@ export default class Index extends Component<any,any> {
     })
   }
 
+  handleClose = ()=>{
+    console.log("close float layout")
+    this.setState({
+      isOpenFloatLayout:false,
+    })
+  }
+
   GotoAdd = ()=>{
     console.log("???")
-    navigateTo({
-      url: 'pages/add/Add'
-    }).then(r=>{
-      console.log(r)
+    this.setState({
+      isOpenFloatLayout:true,
     })
+    // navigateTo({
+    //   url: 'pages/add/Add'
+    // }).then(r=>{
+    //   console.log(r)
+    // })
   }
 
   componentWillMount () { }
@@ -60,33 +71,25 @@ export default class Index extends Component<any,any> {
           </AtFab>
         </View>
 
+        <AtFloatLayout isOpened={this.state.isOpenFloatLayout} title="上传地图" onClose={this.handleClose.bind(this)}>
+          <Add/>
+        </AtFloatLayout>
+
 
         <AtList>
           {this.state.mapList.map((item)=>{
             return (
-              <AtListItem
-                className={'mapItem'}
-                key={item}
-                title={item+''}
-                thumb='https://img12.360buyimg.com/jdphoto/s72x72_jfs/t6160/14/2008729947/2754/7d512a86/595c3aeeNa89ddf71.png'
-              />
+              <View>
+                <AtListItem
+                  className={'mapItem'}
+                  key={item}
+                  title={item+''}
+                  thumb='https://img12.360buyimg.com/jdphoto/s72x72_jfs/t6160/14/2008729947/2754/7d512a86/595c3aeeNa89ddf71.png'
+                />
+              </View>
             )
           })}
 
-
-          {/*<AtListItem*/}
-          {/*  title='标题文字'*/}
-          {/*  note='描述信息'*/}
-          {/*  arrow='right'*/}
-          {/*  thumb='http://img10.360buyimg.com/jdphoto/s72x72_jfs/t5872/209/5240187906/2872/8fa98cd/595c3b2aN4155b931.png'*/}
-          {/*/>*/}
-          {/*<AtListItem*/}
-          {/*  title='标题文字'*/}
-          {/*  note='描述信息'*/}
-          {/*  extraText='详细信息'*/}
-          {/*  arrow='right'*/}
-          {/*  thumb='http://img12.360buyimg.com/jdphoto/s72x72_jfs/t10660/330/203667368/1672/801735d7/59c85643N31e68303.png'*/}
-          {/*/>*/}
         </AtList>
 
       </View>
