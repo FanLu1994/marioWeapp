@@ -12,7 +12,7 @@ type MapController struct {
 }
 
 type MapForm struct {
-	Tags	[]uint 	`json:"tags"`
+	Comment	string 	`json:"comment"`
 	MapId	string 	`json:"map_id"`
 }
 
@@ -40,18 +40,19 @@ func (c *MapController) Add() {
 	newMap := models.Map{
 		MapId: mapForm.MapId,
 		UserId: userId,
+		Comment: mapForm.Comment,
 	}
 	models.GlobalDb.Create(&newMap)
 
-	// 新建map tag映射
-	var mapTagList []models.MapTag
-	for i := 0; i < len(mapForm.Tags); i++ {
-		mapTagList = append(mapTagList, models.MapTag{
-			MapId: newMap.ID,
-			TagId: mapForm.Tags[i],
-		})
-	}
-	models.GlobalDb.Create(&mapTagList)
+	//// 新建map tag映射
+	//var mapTagList []models.MapTag
+	//for i := 0; i < len(mapForm.Tags); i++ {
+	//	mapTagList = append(mapTagList, models.MapTag{
+	//		MapId: newMap.ID,
+	//		TagId: mapForm.Tags[i],
+	//	})
+	//}
+	//models.GlobalDb.Create(&mapTagList)
 
 	// 新建记录
 	newRecord := models.Record{

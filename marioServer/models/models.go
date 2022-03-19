@@ -42,6 +42,7 @@ type WeChatUser struct {
 type Map struct {
 	gorm.Model
 	MapId			string	`json:"mapId"`
+	Comment			string  `json:"comment"`
 	UserId 			uint
 	LikesNum		uint
 	DislikesNum		uint

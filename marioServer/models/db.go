@@ -11,7 +11,7 @@ var GlobalDb *gorm.DB;
 
 
 func init(){
-	dsn := "xiamu:Wuyu1015.@(127.0.0.1:3306)/mario?charset=utf8mb4&parseTime=True&loc=Local"
+	dsn := "root:1234@(127.0.0.1:3306)/mario?charset=utf8mb4&parseTime=True&loc=Local"
 	var err error
 	GlobalDb, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
 

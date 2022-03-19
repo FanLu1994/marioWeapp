@@ -18,6 +18,7 @@ func (c *UserController) Login(){
 	var user models.WeChatUser
 	data := c.Ctx.Input.RequestBody
 	err := json.Unmarshal(data,&user)
+	fmt.Println(user)
 	if err != nil{
 		c.Data["json"] = FailWithMessage("参数错误")
 	}
