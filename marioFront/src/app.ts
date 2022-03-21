@@ -12,6 +12,7 @@ class App extends Component {
       password:"1234",
     }).then(async res=>{
       if(res.data.code===200){
+        taro.setStorageSync('token',res.data.data.token)
         await taro.showToast({
           title: "登录成功",
           duration: 3000,
@@ -25,6 +26,8 @@ class App extends Component {
         })
       }
       console.log(res)
+    }).catch(err=>{
+      console.log(err)
     })
   }
 

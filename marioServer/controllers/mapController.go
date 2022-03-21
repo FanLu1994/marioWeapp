@@ -133,7 +133,7 @@ func (c *MapController) GetRank(){
 
 	var mapList []models.Map
 	if rankType==0{ // 最新上传排行
-		models.GlobalDb.Find(&mapList)
+		models.GlobalDb.Order("created_at desc").Find(&mapList)
 	}else if rankType==1{  // 点赞排行
 		models.GlobalDb.Order("likes_num desc").Find(&mapList)
 	}else if rankType == 2{

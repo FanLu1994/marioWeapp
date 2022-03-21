@@ -18,7 +18,6 @@ function baseOptions(url,params,method:keyof Taro.request.method = 'GET'){
     credentials:'omit',
     cache:'default',
   };
-  // @ts-ignore
   return Taro.request(option);
 }
 

@@ -35,7 +35,7 @@ export default class My extends Component<any,any> {
         <AtTabBar
           backgroundColor='#F6C900'
           tabList={[
-            { title: '游玩过的', text: 8 },
+            { title: '我点赞的', text: 8 },
             { title: '我的上传' }
           ]}
           onClick={this.handleClick.bind(this)}

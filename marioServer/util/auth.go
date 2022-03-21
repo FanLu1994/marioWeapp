@@ -6,6 +6,8 @@ import (
 	"strings"
 )
 
+
+
 func AuthFilter(ctx *context.Context){
 	if strings.HasPrefix(ctx.Request.RequestURI,"/user"){
 		return

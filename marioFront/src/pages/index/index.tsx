@@ -3,6 +3,7 @@ import { Text,View} from '@tarojs/components'
 import './index.less'
 import {AtFab, AtFloatLayout, AtList, AtListItem, AtTabBar} from "taro-ui";
 import Add from "../add/add";
+import * as api from "../../http/api"
 
 
 export default class Index extends Component<any,any> {
@@ -10,13 +11,30 @@ export default class Index extends Component<any,any> {
     super(props);
     this.state = {
       current:0,
-      mapList:[1,2,3,4,5,6,7,8,9,10],
+      mapList:[],
       isOpenFloatLayout:false,
+      type:{
+        recentUpload:0,
+        like:1,
+        dislike:2
+      }
     }
   }
 
   handleClick = (value)=>{
-    console.log(this.state)
+    switch (value){
+      case 0:
+        this.FetchMapList(this.state.type.like)
+        break
+      case 1:
+        this.FetchMapList(this.state.type.recentUpload)
+        break
+      case 2:
+        this.FetchMapList(this.state.type.dislike)
+        break
+      default:
+        break
+    }
     this.setState({
       current:value
     })
@@ -30,18 +48,27 @@ export default class Index extends Component<any,any> {
   }
 
   GotoAdd = ()=>{
-    console.log("???")
     this.setState({
       isOpenFloatLayout:true,
     })
-    // navigateTo({
-    //   url: 'pages/add/Add'
-    // }).then(r=>{
-    //   console.log(r)
-    // })
   }
 
-  componentWillMount () { }
+  FetchMapList = (type)=>{
+    api.getRank({
+      type:type
+    }).then(res=>{
+      console.log(res.data.data)
+      this.setState({
+        mapList:res.data.data
+      })
+    }).catch(err=>{
+      console.log(err)
+    })
+  }
+
+  componentWillMount () {
+    this.FetchMapList(this.state.type['like'])
+  }
 
   componentDidMount () { }
 
@@ -53,8 +80,9 @@ export default class Index extends Component<any,any> {
 
   render () {
     return (
-      <View>
+      <View className={'container'}>
         <AtTabBar
+          className={'header'}
           backgroundColor='#F6C900'
           tabList={[
             { title: '最爱地图' },
@@ -76,16 +104,19 @@ export default class Index extends Component<any,any> {
         </AtFloatLayout>
 
 
-        <AtList>
+        <AtList className={'map-list'}>
           {this.state.mapList.map((item)=>{
             return (
               <View>
                 <AtListItem
                   className={'mapItem'}
-                  key={item+'+index'}
-                  title={item+''}
+                  key={item}
+                  title={item.mapId}
                   thumb='https://img12.360buyimg.com/jdphoto/s72x72_jfs/t6160/14/2008729947/2754/7d512a86/595c3aeeNa89ddf71.png'
                 />
+                <View>
+
+                </View>
               </View>
             )
           })}
