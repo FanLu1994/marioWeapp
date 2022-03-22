@@ -161,16 +161,17 @@ func (c *MapController) UploadList(){
 func (c *MapController) LikeList(){
 	userId  := c.Ctx.Input.GetData("userID").(uint)
 	var records []models.Record
-	models.GlobalDb.Where("user_id = ? and operation = ?",userId,2).Find(&records)
+	models.GlobalDb.Debug().Where("user_id = ? and operation = ?",userId,models.Operation_Like).Find(&records)
 
 	var mapIdList  []uint
 	for i := 0; i < len(records); i++ {
 		mapIdList = append(mapIdList, records[i].MapId)
 	}
-	fmt.Println(mapIdList)
 
 	var mapList []models.Map
-	models.GlobalDb.Where("map_id in ?",mapIdList).Find(&mapList)
+	models.GlobalDb.Debug().Where("id in ?",mapIdList).Find(&mapList)
+	fmt.Println(mapIdList)
+	fmt.Println(mapList)
 
 	var response = SuccessWithData(mapList)
 	c.Data["json"] = response

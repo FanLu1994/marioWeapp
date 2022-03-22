@@ -1,25 +1,60 @@
 import { Component } from 'react'
-import { View} from '@tarojs/components'
+import {Image, View} from '@tarojs/components'
 import './index.less'
-import {AtList, AtListItem, AtTabBar} from "taro-ui";
+import {AtAvatar, AtList, AtListItem, AtTabBar} from "taro-ui";
+import * as api from '../../http/api'
+import mario from "../../asset/images/mairo/mario.jpg";
+import like from "../../asset/images/like.png";
+import hate from "../../asset/images/hate.png";
+
 
 export default class My extends Component<any,any> {
   constructor(props) {
     super(props);
     this.state = {
       current:0,
-      mapList:[1,2,3,4,5,6,7,8,9,10,1,2,3,4,5,6,7,8,9,10],
+      mapList:[],
     }
   }
 
   handleClick = (value)=>{
-    console.log(this.state)
-    this.setState({
-      current:value
+    switch (value){
+      case 0:
+        this.fectchMyLikeList()
+        break
+      case 1:
+        this.fectchMyUploadList()
+        break
+      default:
+        break
+    }
+  }
+
+  fectchMyLikeList(){
+    api.getLikeList().then(res=>{
+      console.log(res)
+      this.setState({
+        mapList:res.data.data
+      })
+    }).catch(err=>{
+      console.log(err)
     })
   }
 
-  componentWillMount () { }
+  fectchMyUploadList(){
+    api.getUploadList().then(res=>{
+      console.log(res)
+      this.setState({
+        mapList:res.data.data
+      })
+    }).catch(err=>{
+      console.log(err)
+    })
+  }
+
+  componentWillMount () {
+    this.fectchMyLikeList()
+  }
 
   componentDidMount () { }
 
@@ -43,15 +78,31 @@ export default class My extends Component<any,any> {
         />
 
         <AtList>
-          {this.state.mapList.map((item,index)=>{
+          {this.state.mapList.map((item)=>{
             return (
-              <AtListItem
-                className={'mapItem'}
-                key={index}
-                title={item+''}
-                arrow='right'
-                thumb='https://img12.360buyimg.com/jdphoto/s72x72_jfs/t6160/14/2008729947/2754/7d512a86/595c3aeeNa89ddf71.png'
-              />
+              <View className={"list-item"} key={item.mapId}>
+                <View className={"list-item-left"}>
+                  <view className={"map-info"}>
+                    <view className={"map-image"}>
+                      <AtAvatar circle image={mario}/>
+                    </view>
+                    <View className={"map-id"}>
+                      {item.mapId}
+                    </View>
+                  </view>
+                  <view className={"map-comment"}>
+                    推荐语：{item.comment}
+                  </view>
+                </View>
+                <View className={"list-item-right"}>
+                  <View className={"like-button"}>
+                    <Image src={like} className={"operation-icon"}/>
+                  </View>
+                  <View className={"hate-button"}>
+                    <Image src={hate} className={"operation-icon"}/>
+                  </View>
+                </View>
+              </View>
             )
           })}
         </AtList>

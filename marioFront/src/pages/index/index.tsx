@@ -1,9 +1,12 @@
 import { Component } from 'react'
-import { Text,View} from '@tarojs/components'
+import { Text,View,Image} from '@tarojs/components'
 import './index.less'
-import {AtFab, AtFloatLayout, AtList, AtListItem, AtTabBar} from "taro-ui";
+import {AtAvatar, AtFab, AtFloatLayout, AtIcon, AtList, AtTabBar} from "taro-ui";
 import Add from "../add/add";
 import * as api from "../../http/api"
+import mario from "../../asset/images/mairo/mario.jpg"
+import like from "../../asset/images/like.png"
+import hate from "../../asset/images/hate.png"
 
 
 export default class Index extends Component<any,any> {
@@ -107,15 +110,27 @@ export default class Index extends Component<any,any> {
         <AtList className={'map-list'}>
           {this.state.mapList.map((item)=>{
             return (
-              <View>
-                <AtListItem
-                  className={'mapItem'}
-                  key={item}
-                  title={item.mapId}
-                  thumb='https://img12.360buyimg.com/jdphoto/s72x72_jfs/t6160/14/2008729947/2754/7d512a86/595c3aeeNa89ddf71.png'
-                />
-                <View>
-
+              <View className={"list-item"} key={item.mapId}>
+                <View className={"list-item-left"}>
+                  <view className={"map-info"}>
+                    <view className={"map-image"}>
+                      <AtAvatar circle image={mario}/>
+                    </view>
+                    <View className={"map-id"}>
+                      {item.mapId}
+                    </View>
+                  </view>
+                  <view className={"map-comment"}>
+                    推荐语：{item.comment}
+                  </view>
+                </View>
+                <View className={"list-item-right"}>
+                  <View className={"like-button"}>
+                    <Image src={like} className={"operation-icon"}/>
+                  </View>
+                  <View className={"hate-button"}>
+                    <Image src={hate} className={"operation-icon"}/>
+                  </View>
                 </View>
               </View>
             )
