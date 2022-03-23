@@ -1,12 +1,13 @@
 import { Component } from 'react'
 import { Text,View,Image} from '@tarojs/components'
 import './index.less'
-import {AtAvatar, AtFab, AtFloatLayout, AtIcon, AtList, AtTabBar} from "taro-ui";
+import {AtAvatar, AtFab, AtFloatLayout, AtList, AtTabBar} from "taro-ui";
 import Add from "../add/add";
 import * as api from "../../http/api"
-import mario from "../../asset/images/mairo/mario.jpg"
+import {getRandomImage} from "../../util/ImageUtil";
 import like from "../../asset/images/like.png"
 import hate from "../../asset/images/hate.png"
+import {DislikeMap, LikeMap} from "../../util/Comment";
 
 
 export default class Index extends Component<any,any> {
@@ -69,6 +70,10 @@ export default class Index extends Component<any,any> {
     })
   }
 
+  likeMap = (mapId)=>{
+    LikeMap(mapId)
+  }
+
   componentWillMount () {
     this.FetchMapList(this.state.type['like'])
   }
@@ -114,7 +119,7 @@ export default class Index extends Component<any,any> {
                 <View className={"list-item-left"}>
                   <view className={"map-info"}>
                     <view className={"map-image"}>
-                      <AtAvatar circle image={mario}/>
+                      <AtAvatar circle image={getRandomImage()}/>
                     </view>
                     <View className={"map-id"}>
                       {item.mapId}
@@ -125,10 +130,10 @@ export default class Index extends Component<any,any> {
                   </view>
                 </View>
                 <View className={"list-item-right"}>
-                  <View className={"like-button"}>
+                  <View className={"like-button"} onClick={LikeMap.bind(this,item.ID)}>
                     <Image src={like} className={"operation-icon"}/>
                   </View>
-                  <View className={"hate-button"}>
+                  <View className={"hate-button"} onClick={DislikeMap.bind(this,item.ID)}>
                     <Image src={hate} className={"operation-icon"}/>
                   </View>
                 </View>

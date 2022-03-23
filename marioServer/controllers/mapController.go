@@ -71,8 +71,10 @@ func (c *MapController) Add() {
 func (c *MapController) Comment() {
 	var mapCommentForm = new(MapCommentForm)
 	data := c.Ctx.Input.RequestBody
+	fmt.Println(data)
 	err := json.Unmarshal(data,&mapCommentForm)
 	if err!=nil{
+		fmt.Println(err)
 		response := FailWithMessage("参数错误")
 		c.Data["json"] = response
 		c.ServeJSON()
