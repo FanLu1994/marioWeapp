@@ -1,10 +1,10 @@
 package models
 
 
-type operationType int32
+type OperationType int32
 
 const (
-	Operation_Upload	operationType = 1
-	Operation_Like		operationType =	2
-	Operation_Dislike 	operationType = 3
+	Operation_Upload	OperationType = 1
+	Operation_Like		OperationType =	2
+	Operation_Dislike 	OperationType = 3
 )

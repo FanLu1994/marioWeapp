@@ -61,7 +61,6 @@ func (c *UserController) Register(){
 		c.Data["json"] = FailWithMessage("用户名已存在")
 		c.ServeJSON()
 	}else{
-		fmt.Println(user)
 		models.GlobalDb.Save(&user)
 		c.Data["json"] = SuccessWithMessage("注册成功")
 	}

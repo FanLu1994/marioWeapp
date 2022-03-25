@@ -1,7 +1,6 @@
 package util
 
 import (
-	"fmt"
 	"github.com/astaxie/beego/context"
 	"strings"
 )
@@ -14,7 +13,6 @@ func AuthFilter(ctx *context.Context){
 	}
 
 	token := ctx.Request.Header.Get("Authorization")
-	fmt.Println(token)
 	if token=="" {
 		ctx.Redirect(302,"/user/unauth")
 	}
@@ -23,7 +21,6 @@ func AuthFilter(ctx *context.Context){
 		// TDO: 不同错误处理
 		ctx.Redirect(302,"/user/unauth")
 	}else{
-		fmt.Println("claims",claims.UID)
 		ctx.Input.SetData("userID", claims.UID)
 	}
 }

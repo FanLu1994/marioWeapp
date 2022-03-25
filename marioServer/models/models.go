@@ -54,6 +54,13 @@ type MapTag struct {
 	TagId			uint  `json:"tagId"`
 }
 
+type MapComment struct{
+	gorm.Model
+	MapId			uint	`json:"mapId"`
+	UserId			uint    `json:"userId"`
+	Like			uint    `json:"like"`    // 1 为喜欢，2为不喜欢
+}
+
 type Tag struct {
 	gorm.Model
 	Name     		string 	`json:"tagName"`
@@ -62,7 +69,7 @@ type Tag struct {
 type Record struct {
 	gorm.Model
 	UserId 			uint
-	Operation		operationType
+	Operation		OperationType
 	MapId			uint
 }
 

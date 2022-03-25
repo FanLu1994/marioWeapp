@@ -25,5 +25,6 @@ func init(){
 		Map{},
 		Tag{},
 		Record{},
+		MapComment{},
 		MapTag{})
 }

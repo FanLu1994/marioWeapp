@@ -18,7 +18,7 @@ func (c *RecordController) GetRecordList()  {
 	if recordType==0 {
 		models.GlobalDb.Where("user_id = ? ",userId).Find(&recordList)
 	}else{
-		models.GlobalDb.Where("user_id = ? and operation = ?",userId,recordType).Find(&recordList)
+		models.GlobalDb.Where("user_id = ? and operation = ?",userId,recordType).Find(&recordList).Limit(50)
 	}
 
 	response := SuccessWithData(recordList)

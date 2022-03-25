@@ -6,8 +6,9 @@ import Add from "../add/add";
 import * as api from "../../http/api"
 import {getRandomImage} from "../../util/ImageUtil";
 import like from "../../asset/images/like.png"
+import like_active from "../../asset/images/like_active.png"
 import hate from "../../asset/images/hate.png"
-import {DislikeMap, LikeMap} from "../../util/Comment";
+import hate_active from "../../asset/images/hate_active.png"
 
 
 export default class Index extends Component<any,any> {
@@ -57,6 +58,31 @@ export default class Index extends Component<any,any> {
     })
   }
 
+  LikeMap = (id:number)=>{
+    api.addComment({
+      map_id:id,
+      like:true,
+    }).then(res=>{
+      console.log(res.data)
+      this.FetchMapList(this.state.value)
+    }).catch(err=>{
+      console.log(err)
+    })
+  }
+
+  DislikeMap = (id:number)=>{
+    api.addComment({
+      map_id:id,
+      like:false,
+    }).then(res=>{
+      console.log(res.data)
+      this.FetchMapList(this.state.value)
+    }).catch(err=>{
+      console.log(err)
+    })
+  }
+
+
   FetchMapList = (type)=>{
     api.getRank({
       type:type
@@ -70,12 +96,24 @@ export default class Index extends Component<any,any> {
     })
   }
 
-  likeMap = (mapId)=>{
-    LikeMap(mapId)
-  }
 
   componentWillMount () {
     this.FetchMapList(this.state.type['like'])
+  }
+
+  getLikedSrc(isLike){
+    if(isLike){
+      return like_active
+    }
+    return like
+  }
+
+  getHateSrc(isHate){
+    console.log(isHate)
+    if(isHate){
+      return hate_active
+    }
+    return hate
   }
 
   componentDidMount () { }
@@ -115,26 +153,26 @@ export default class Index extends Component<any,any> {
         <AtList className={'map-list'}>
           {this.state.mapList.map((item)=>{
             return (
-              <View className={"list-item"} key={item.mapId}>
+              <View className={"list-item"} key={item.map_id}>
                 <View className={"list-item-left"}>
-                  <view className={"map-info"}>
-                    <view className={"map-image"}>
+                  <View className={"map-info"}>
+                    <View className={"map-image"}>
                       <AtAvatar circle image={getRandomImage()}/>
-                    </view>
-                    <View className={"map-id"}>
-                      {item.mapId}
                     </View>
-                  </view>
-                  <view className={"map-comment"}>
+                    <View className={"map-id"}>
+                      {item.map_id}
+                    </View>
+                  </View>
+                  <View className={"map-comment"}>
                     推荐语：{item.comment}
-                  </view>
+                  </View>
                 </View>
                 <View className={"list-item-right"}>
-                  <View className={"like-button"} onClick={LikeMap.bind(this,item.ID)}>
-                    <Image src={like} className={"operation-icon"}/>
+                  <View className={"like-button"} onClick={this.LikeMap.bind(this,item.id)}>
+                    <Image src={this.getLikedSrc(item.like===1)} className={"operation-icon"}/>
                   </View>
-                  <View className={"hate-button"} onClick={DislikeMap.bind(this,item.ID)}>
-                    <Image src={hate} className={"operation-icon"}/>
+                  <View className={"hate-button"} onClick={this.DislikeMap.bind(this,item.id)}>
+                    <Image src={this.getHateSrc(item.like===2)} className={"operation-icon"}/>
                   </View>
                 </View>
               </View>

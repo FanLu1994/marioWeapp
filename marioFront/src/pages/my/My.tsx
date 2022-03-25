@@ -6,7 +6,6 @@ import * as api from '../../http/api'
 import like from "../../asset/images/like.png";
 import hate from "../../asset/images/hate.png";
 import {getRandomImage} from "../../util/ImageUtil";
-import {DislikeMap, LikeMap} from "../../util/Comment";
 
 export default class My extends Component<any,any> {
   constructor(props) {
@@ -29,6 +28,7 @@ export default class My extends Component<any,any> {
         break
     }
   }
+
 
   fectchMyLikeList(){
     api.getLikeList().then(res=>{
@@ -82,24 +82,16 @@ export default class My extends Component<any,any> {
             return (
               <View className={"list-item"} key={item.mapId}>
                 <View className={"list-item-left"}>
-                  <view className={"map-info"}>
-                    <view className={"map-image"}>
+                  <View className={"map-info"}>
+                    <View className={"map-image"}>
                       <AtAvatar circle image={getRandomImage()}/>
-                    </view>
+                    </View>
                     <View className={"map-id"}>
                       {item.mapId}
                     </View>
-                  </view>
-                  <view className={"map-comment"}>
-                    推荐语：{item.comment}
-                  </view>
-                </View>
-                <View className={"list-item-right"}>
-                  <View className={"like-button"} onClick={LikeMap.bind(this,item.ID)}>
-                    <Image src={like} className={"operation-icon"}/>
                   </View>
-                  <View className={"hate-button"} onClick={DislikeMap.bind(this,item.ID)}>
-                    <Image src={hate} className={"operation-icon"}/>
+                  <View className={"map-comment"}>
+                    推荐语：{item.comment}
                   </View>
                 </View>
               </View>

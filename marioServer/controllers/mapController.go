@@ -21,6 +21,14 @@ type MapCommentForm struct {
 	Like	bool	`json:"like"`
 }
 
+type MapDTO struct{
+	Id 				uint `json:"id"`
+	MapId 			string `json:"map_id"`
+	Comment 		string `json:"comment"`
+	LikesNum		uint `json:"likes_num"`
+	DislikesNum		uint `json:"dislikes_num"`
+	Like			int32 `json:"like"`
+}
 
 // 添加地图
 func (c *MapController) Add() {
@@ -68,10 +76,9 @@ func (c *MapController) Add() {
 }
 
 // 评价map 点赞、点踩
-func (c *MapController) Comment() {
+func (c *MapController) AddMapComment(){
 	var mapCommentForm = new(MapCommentForm)
 	data := c.Ctx.Input.RequestBody
-	fmt.Println(data)
 	err := json.Unmarshal(data,&mapCommentForm)
 	if err!=nil{
 		fmt.Println(err)
@@ -80,7 +87,6 @@ func (c *MapController) Comment() {
 		c.ServeJSON()
 		return
 	}
-
 	userId  := c.Ctx.Input.GetData("userID").(uint)
 
 	// 更新地图点赞数
@@ -92,57 +98,135 @@ func (c *MapController) Comment() {
 		c.ServeJSON()
 		return
 	}
-
 	// 检查是否点过赞
-	record := models.Record{}
+	commentRecord := models.MapComment{}
 	result = models.GlobalDb.
-		Where("user_id = ? and map_id = ? and operation != ?",userId,mapCommentForm.MapId,1).
-		Find(&record)
+		Where("user_id = ? and map_id = ?",userId,mapCommentForm.MapId).
+		Find(&commentRecord)
 	if result.RowsAffected>0{
-		var response = FailWithMessage("您已经评价过该地图！")
+		if mapCommentForm.Like {
+			gameMap.LikesNum--
+			commentRecord.Like = 1
+		}else{
+			gameMap.DislikesNum--
+			commentRecord.Like = 2
+		}
+		tx := models.GlobalDb.Begin()
+		tx.Save(commentRecord)
+		tx.Save(gameMap)
+		tx.Commit()
+		response := SuccessWithMessage("更新评价成功！")
 		c.Data["json"] = response
 		c.ServeJSON()
 		return
 	}
-
-
 	// 新建操作记录
-	record = models.Record{
+	commentRecord = models.MapComment{
 		UserId: userId,
 		MapId: mapCommentForm.MapId,
 	}
-
-	if mapCommentForm.Like{
+	if mapCommentForm.Like {
 		gameMap.LikesNum++
-		record.Operation = models.Operation_Like
-	}else {
-		gameMap.LikesNum--
-		record.Operation = models.Operation_Dislike
+		commentRecord.Like = 1
+	}else{
+		gameMap.DislikesNum++
+		commentRecord.Like = 2
 	}
-
-	models.GlobalDb.Create(&record)
-	models.GlobalDb.Save(gameMap)
+	tx := models.GlobalDb.Begin()
+	tx.Create(&commentRecord)
+	tx.Save(gameMap)
+	tx.Commit()
 
 	var response = Success()
 	c.Data["json"] = response
 	c.ServeJSON()
 }
 
+func (c *MapController) CancleMapComment(){
+	var mapCommentForm = new(MapCommentForm)
+	data := c.Ctx.Input.RequestBody
+	err := json.Unmarshal(data,&mapCommentForm)
+	if err!=nil{
+		fmt.Println(err)
+		response := FailWithMessage("参数错误")
+		c.Data["json"] = response
+		c.ServeJSON()
+		return
+	}
+	userId  := c.Ctx.Input.GetData("userID").(uint)
+
+	// 更新地图点赞数
+	gameMap := models.Map{}
+	result := models.GlobalDb.First(&gameMap,mapCommentForm.MapId)
+	if result.RowsAffected==0{
+		var response = FailWithMessage("找不到指定的地图")
+		c.Data["json"] = response
+		c.ServeJSON()
+		return
+	}
+	// 检查是否点过赞
+	commentRecord := models.MapComment{}
+	result = models.GlobalDb.
+		Where("user_id = ? and map_id = ?",userId,mapCommentForm.MapId).
+		Find(&commentRecord)
+	if result.RowsAffected>0{
+		var response = FailWithMessage("评价并不存在")
+		c.Data["json"] = response
+		c.ServeJSON()
+		return
+	}
+	if mapCommentForm.Like {
+		gameMap.LikesNum--
+	}else{
+		gameMap.DislikesNum--
+	}
+	tx := models.GlobalDb.Begin()
+	tx.Delete(commentRecord)
+	tx.Save(gameMap)
+	tx.Commit()
+	var response = SuccessWithMessage("取消评价成功！")
+	c.Data["json"] = response
+	c.ServeJSON()
+}
+
+
 // 获取map排行榜  暂时只支持最新上传、点赞排行、点踩排行
 func (c *MapController) GetRank(){
+	userId  := c.Ctx.Input.GetData("userID").(uint)
 	rankType, _ := c.GetInt("type")
 	fmt.Println(rankType)
 
-	var mapList []models.Map
+	var result []MapDTO
 	if rankType==0{ // 最新上传排行
-		models.GlobalDb.Order("created_at desc").Find(&mapList)
+		//models.GlobalDb.Order("created_at desc").Find(&mapList)
+		models.GlobalDb.Model(&models.Map{}).
+			Select("maps.id,maps.comment,maps.map_id,maps.likes_num,maps.dislikes_num,map_comments.like").
+			Joins("left join map_comments on map_comments.map_id=maps.id and map_comments.user_id=?",userId).
+			Order("maps.created_at desc").
+			Limit(50).
+			Scan(&result)
 	}else if rankType==1{  // 点赞排行
-		models.GlobalDb.Order("likes_num desc").Find(&mapList)
-	}else if rankType == 2{
-		models.GlobalDb.Order("dislikes_num desc").Find(&mapList)
+		//models.GlobalDb.Order("likes_num desc").Find(&mapList).Limit(50)
+		models.GlobalDb.Model(&models.Map{}).
+			Select("maps.id,maps.comment,maps.map_id,maps.likes_num,maps.dislikes_num,map_comments.like,map_comments.user_id").
+			Joins("left join map_comments on map_comments.map_id=maps.id and map_comments.user_id=?",userId).
+			Order("maps.likes_num desc").
+			Limit(50).
+			Scan(&result)
+		//models.GlobalDb.Order("dislikes_num desc").Find(&mapList).Limit(50)
+	}else{
+		models.GlobalDb.Model(&models.Map{}).
+			Select("maps.id,maps.comment,maps.map_id,maps.likes_num,maps.dislikes_num,map_comments.like,map_comments.user_id").
+			Joins("left join map_comments on map_comments.map_id=maps.id and map_comments.user_id=?",userId).
+		    Order("maps.dislikes_num desc").
+			Limit(50).
+			Scan(&result)
 	}
 
-	var response = SuccessWithData(mapList)
+	var recordList []models.Record
+	models.GlobalDb.Where("user_id = ?",userId).Find(&recordList)
+
+	var response = SuccessWithData(result)
 	c.Data["json"] = response
 	c.ServeJSON()
 }
@@ -152,7 +236,7 @@ func (c *MapController) GetRank(){
 func (c *MapController) UploadList(){
 	userId  := c.Ctx.Input.GetData("userID").(uint)
 	var mapList []models.Map
-	models.GlobalDb.Where("user_id = ?",userId).Find(&mapList)
+	models.GlobalDb.Where("user_id = ?",userId).Find(&mapList).Limit(50)
 
 	var response = SuccessWithData(mapList)
 	c.Data["json"] = response
@@ -163,7 +247,7 @@ func (c *MapController) UploadList(){
 func (c *MapController) LikeList(){
 	userId  := c.Ctx.Input.GetData("userID").(uint)
 	var records []models.Record
-	models.GlobalDb.Debug().Where("user_id = ? and operation = ?",userId,models.Operation_Like).Find(&records)
+	models.GlobalDb.Debug().Where("user_id = ? and operation = ?",userId,models.Operation_Like).Find(&records).Limit(50)
 
 	var mapIdList  []uint
 	for i := 0; i < len(records); i++ {
@@ -172,8 +256,6 @@ func (c *MapController) LikeList(){
 
 	var mapList []models.Map
 	models.GlobalDb.Debug().Where("id in ?",mapIdList).Find(&mapList)
-	fmt.Println(mapIdList)
-	fmt.Println(mapList)
 
 	var response = SuccessWithData(mapList)
 	c.Data["json"] = response
